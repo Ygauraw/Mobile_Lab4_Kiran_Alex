@@ -1,4 +1,4 @@
-package com.example.trackit;
+package com.productivity.trackit;
 
 import java.util.Iterator;
 import java.util.List;

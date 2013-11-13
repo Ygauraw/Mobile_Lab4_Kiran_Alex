@@ -17,19 +17,19 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         
-        <receiver android:name="com.example.trackit.SysBootBroadcastReceiver">  
+        <receiver android:name="com.productivity.trackit.SysBootBroadcastReceiver">  
     		<intent-filter>  
         		<action android:name="android.intent.action.BOOT_COMPLETED" />  
     		</intent-filter>  
 		</receiver>
 		
-        <service android:name="com.example.trackit.AppUsageService"
+        <service android:name="com.productivity.trackit.AppUsageService"
         android:process=":background" />
         
         <receiver android:name="Alarm" android:process=":servicealarm" />
         
         <activity
-            android:name="com.example.trackit.AppList"
+            android:name="com.productivity.trackit.AppList"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,6 @@
-package com.example.trackit;
+package com.productivity.trackit;
+
+import com.example.trackit.R;
 
 import android.os.Bundle;
 import android.app.Activity;
