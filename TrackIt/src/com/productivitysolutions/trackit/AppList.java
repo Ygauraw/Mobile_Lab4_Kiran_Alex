@@ -1,10 +1,13 @@
-package com.example.trackit;
+package com.productivitysolutions.trackit;
+
+import com.productivitysolutions.trackit.R;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ListActivity;
 import android.view.Menu;
 
-public class AppList extends Activity {
+public class AppList extends ListActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
