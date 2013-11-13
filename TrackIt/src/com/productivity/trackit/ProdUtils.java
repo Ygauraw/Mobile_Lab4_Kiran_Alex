@@ -10,5 +10,8 @@ public class ProdUtils {
 	
 	//string to denote unlabelled app
 	public static final String NO_LABEL = "no label";
+	
+	//AppUsageService period in milliseconds
+	public static final long SERVICE_PERIOD = 100;
 
 }

@@ -10,7 +10,7 @@ import android.content.Intent;
 
 public class SysBootBroadcastReceiver extends BroadcastReceiver {
 	
-	static Boolean serviceInitiated = false;
+	private static Boolean serviceInitiated = false;
 	
 	@Override
     public void onReceive(Context context, Intent intent) {
@@ -26,7 +26,7 @@ public class SysBootBroadcastReceiver extends BroadcastReceiver {
 
 		AlarmManager alarm = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
 		// Start every 0.1 seconds
-		alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), 100, pintent); 
+		alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), ProdUtils.SERVICE_PERIOD, pintent); 
     }
 	
 	/**
