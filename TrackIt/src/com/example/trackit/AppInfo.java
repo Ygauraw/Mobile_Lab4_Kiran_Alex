@@ -1,4 +1,4 @@
-package com.productivitysolutions.trackit;
+package com.example.trackit;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

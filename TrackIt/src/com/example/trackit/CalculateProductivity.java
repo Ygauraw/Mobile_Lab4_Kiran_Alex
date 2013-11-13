@@ -1,4 +1,4 @@
-package com.productivitysolutions.trackit;
+package com.example.trackit;
 
 import java.util.ArrayList;
 
