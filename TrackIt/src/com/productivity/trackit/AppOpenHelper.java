@@ -10,6 +10,7 @@ public class AppOpenHelper extends SQLiteOpenHelper{
 	public static final String APP_TABLE_NAME = "applist";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_PACKAGE = "package";
+	public static final String COLUMN_LABEL = "label";
 	public static final String COLUMN_RUNTIME = "runtime";
 	public static final String COLUMN_STARTTIME = "starttime";
 	public static final String COLUMN_ACTIVE = "active";
@@ -22,7 +23,8 @@ public class AppOpenHelper extends SQLiteOpenHelper{
 	private static final String DATABASE_CREATE = "create table "
 			+ APP_TABLE_NAME + "(" 
 			+ COLUMN_ID + " integer primary key autoincrement, "
-			+ COLUMN_PACKAGE + " package name of app, " 
+			+ COLUMN_PACKAGE + " package name of app, "
+			+ COLUMN_LABEL + " productivity of app, "
 			+ COLUMN_RUNTIME + " time app was open today, " 
 			+ COLUMN_STARTTIME + " time app was started, " 
 			+ COLUMN_ACTIVE + " is this app currently running in foreground, " 
