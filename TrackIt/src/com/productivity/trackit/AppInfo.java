@@ -13,6 +13,7 @@ public class AppInfo {
 	boolean active;
 	Context mContext;
 	long appID;
+	String dateRecorded;
 	
 	public AppInfo(PackageInfo pinfo, Context context){
 		this.appPackage = pinfo;
@@ -59,6 +60,14 @@ public class AppInfo {
 	
 	public long getRunTime(){
 		return runTime;
+	}
+	
+	public void setDateRecorded(String dateRecorded){
+		this.dateRecorded = dateRecorded;
+	}
+	
+	public String getDateRecorded(){
+		return dateRecorded;
 	}
 	
 	private void setName(){

@@ -19,6 +19,7 @@ public class AppsDataSource {
   private AppOpenHelper dbHelper;
   private String[] allColumns = { AppOpenHelper.COLUMN_ID,
 		  						  AppOpenHelper.COLUMN_PACKAGE,
+		  						  AppOpenHelper.COLUMN_LABEL,
 		  						  AppOpenHelper.COLUMN_RUNTIME,
 		  						  AppOpenHelper.COLUMN_STARTTIME,
 		  						  AppOpenHelper.COLUMN_ACTIVE,
@@ -38,9 +39,10 @@ public class AppsDataSource {
     dbHelper.close();
   }
 
-  public AppInfo createApp(String appPackage, long runTime, long startTime, boolean active, String dateRecorded) {
+  public AppInfo createApp(String appPackage, String label, long runTime, long startTime, boolean active, String dateRecorded) {
     ContentValues values = new ContentValues();
     values.put(AppOpenHelper.COLUMN_PACKAGE, appPackage);
+    values.put(AppOpenHelper.COLUMN_PACKAGE, label);
     values.put(AppOpenHelper.COLUMN_RUNTIME, runTime);
     values.put(AppOpenHelper.COLUMN_STARTTIME, startTime);
     values.put(AppOpenHelper.COLUMN_ACTIVE, String.valueOf(active));
@@ -58,7 +60,7 @@ public class AppsDataSource {
 
   public void deleteApp(AppInfo app) {
     long id = app.getId();
-    System.out.println("Comment deleted with id: " + id);
+    System.out.println("App deleted with id: " + id);
     database.delete(AppOpenHelper.APP_TABLE_NAME, AppOpenHelper.COLUMN_ID
         + " = " + id, null);
   }
@@ -82,7 +84,7 @@ public class AppsDataSource {
 
   private AppInfo cursorToApp(Cursor cursor) {
 	  PackageManager pm = mContext.getPackageManager();
-	  PackageInfo packageinfo;
+	  PackageInfo packageinfo = null;
 		try {
 			packageinfo = pm.getPackageInfo (cursor.getString(1), 0);
 			//update database
@@ -93,7 +95,11 @@ public class AppsDataSource {
 		}
     AppInfo app = new AppInfo(packageinfo, mContext);
     app.setId(cursor.getLong(0));
-    app.setComment(cursor.getString(1));
+    app.setLabel(cursor.getString(2));
+    app.setRunTime(cursor.getLong(3));
+    app.setStartTime(cursor.getLong(4));
+    app.setActive(Boolean.valueOf(cursor.getString(5)));
+    app.setDateRecorded(cursor.getString(6));
     return app;
   }
 } 
