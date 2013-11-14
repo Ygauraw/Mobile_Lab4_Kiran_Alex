@@ -8,15 +8,25 @@ public class AppInfo {
 	String name;
 	String label;
 	long runTime;
+	long startTime;
 	PackageInfo appPackage;
 	boolean active;
 	Context mContext;
+	long appID;
 	
 	public AppInfo(PackageInfo pinfo, Context context){
 		this.appPackage = pinfo;
 		mContext = context;
 		setName();
 		runTime = 0;
+	}
+	
+	public void setId(long id){
+		this.appID = id;
+	}
+	
+	public long getId(){
+		return appID;
 	}
 	
 	public void setLabel(String label){
@@ -27,8 +37,24 @@ public class AppInfo {
 		return label;
 	}
 	
+	public void setStartTime(long starTime){
+		this.startTime = startTime;
+	}
+	
+	public long getStartTime(){
+		return startTime;
+	}
+	
+	public boolean getActive(){
+		return active;
+	}
+	
 	public void setActive(boolean active){
 		this.active = active;
+	}
+	
+	public void setRunTime(long runTime){
+		this.runTime = runTime;
 	}
 	
 	public long getRunTime(){
