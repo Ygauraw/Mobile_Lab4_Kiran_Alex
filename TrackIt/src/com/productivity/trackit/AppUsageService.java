@@ -1,5 +1,9 @@
 package com.productivity.trackit;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -57,6 +61,18 @@ public class AppUsageService extends Service {
      * Updates the SQLite database as to what app is in the foreground
      */
     private void getForegroundApp(){
+    	AppsDataSource appData = new AppsDataSource(this);
+    	appData.open();
+    	List<AppInfo> allApps = appData.getAllAppss();
+    	AppInfo lastActiveApp = null;
+    	AppInfo currentActiveApp = null;
+    	for(AppInfo app : allApps){
+    		if(app.getActive()){
+    			lastActiveApp = app;
+    			break;
+    		}
+    	}
+    	
     	ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         List<RunningAppProcessInfo> runningAppProcesses = mActivityManager.getRunningAppProcesses();
         Iterator<RunningAppProcessInfo> i = runningAppProcesses.iterator();
@@ -68,9 +84,44 @@ public class AppUsageService extends Service {
             		String[] packages = info.pkgList;
             		String foregroundpackage = packages[0];
             		PackageManager pm = this.getPackageManager();
+            		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+					Date date = new Date();
             		try {
 						PackageInfo packageinfo = pm.getPackageInfo (foregroundpackage, 0);
-						//update database
+						Boolean exists = false;
+						for(AppInfo app : allApps){
+				    		if(app.getPackageInfo().equals(packageinfo)){
+				    			currentActiveApp = app;
+				    			exists = true;
+				    			break;
+				    		}
+				    	}
+						if(!exists){
+							currentActiveApp = appData.createApp(foregroundpackage, ProdUtils.NO_LABEL, 0, 
+														0, true, dateFormat.format(date));
+						}
+						if(!currentActiveApp.equals(lastActiveApp)){
+							if(lastActiveApp != null){
+								long newRunTime;
+								if(lastActiveApp.getDateRecorded().equals(dateFormat.format(date))){
+									newRunTime = lastActiveApp.getRunTime() + (System.currentTimeMillis() - lastActiveApp.getStartTime());
+								}
+								else{
+									Calendar c = Calendar.getInstance(); //midnight
+								    c.set(Calendar.HOUR_OF_DAY, 0);
+								    c.set(Calendar.MINUTE, 0);
+								    c.set(Calendar.SECOND, 0);
+								    c.set(Calendar.MILLISECOND, 0);
+									newRunTime = System.currentTimeMillis() - c.getTimeInMillis();
+								}
+								appData.deleteApp(lastActiveApp);
+								appData.createApp(lastActiveApp.getPackageInfo().packageName, lastActiveApp.getLabel(), 
+										newRunTime, 0, false, dateFormat.format(date));
+							}
+							appData.deleteApp(currentActiveApp);
+							appData.createApp(currentActiveApp.getPackageInfo().packageName, currentActiveApp.getLabel(), 
+									currentActiveApp.getRunTime(), System.currentTimeMillis(), true, dateFormat.format(date));
+						}
 						
 					} catch (NameNotFoundException e) {
 						// TODO Auto-generated catch block
@@ -78,6 +129,7 @@ public class AppUsageService extends Service {
 					}
                }
            }
+        appData.close();
     }
 
 }
