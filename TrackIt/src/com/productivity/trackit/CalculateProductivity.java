@@ -10,7 +10,7 @@ public class CalculateProductivity {
 		CalculateProductivity.allApps = allApps;
 	}
 	
-	private static long totalRunTime(){
+	public static long totalRunTime(){
 		long totalTime = 0;
 		for(AppInfo app : allApps){
 			totalTime += app.getRunTime();

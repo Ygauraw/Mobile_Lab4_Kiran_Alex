@@ -14,6 +14,18 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Productivity = 100%"/>
+    <ListView
+        android:id="@+id/productive_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/productivity_score"
+        android:text="this is list 1"/>
+    <ListView 
+        android:id="@+id/unproductive_list"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/productive_list"
+        android:text="this is list 2"/>
 
     
 </RelativeLayout>
