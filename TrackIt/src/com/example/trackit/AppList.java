@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ public class AppList extends Activity {
 	TextView text1;
 	ListView prodList;
 	ListView unProdList;
+	
+	ArrayAdapter<String> aa;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +41,10 @@ public class AppList extends Activity {
 		prodList = (ListView)findViewById(R.id.productive_list);
 		unProdList = (ListView)findViewById(R.id.unproductive_list);
 		
+		aa = new ArrayAdapter<String>(this, R.layout.productive_list);
 		
+		aa.add("this is a list test");
+		prodList.setAdapter(aa);
 		
 	}
 
