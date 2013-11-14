@@ -1,20 +1,23 @@
-package com.productivity.trackit;
+package com.example.trackit;
 
 import java.util.Calendar;
-
-import com.productivity.trackit.R;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class AppList extends Activity {
 
+	TextView text1;
+	ListView prodList;
+	ListView unProdList;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,6 +33,13 @@ public class AppList extends Activity {
 			// Start every 0.1 seconds
 			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), ProdUtils.SERVICE_PERIOD, pintent);
 		}
+		
+		text1 = (TextView)findViewById(R.id.productivity_score);
+		prodList = (ListView)findViewById(R.id.productive_list);
+		unProdList = (ListView)findViewById(R.id.unproductive_list);
+		
+		
+		
 	}
 
 	@Override

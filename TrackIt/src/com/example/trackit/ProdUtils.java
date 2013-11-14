@@ -1,4 +1,4 @@
-package com.productivity.trackit;
+package com.example.trackit;
 
 public class ProdUtils {
 	

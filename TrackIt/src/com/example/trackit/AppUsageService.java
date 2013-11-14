@@ -1,4 +1,4 @@
-package com.productivity.trackit;
+package com.example.trackit;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
