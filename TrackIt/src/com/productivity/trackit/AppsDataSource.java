@@ -5,6 +5,9 @@ import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -20,9 +23,11 @@ public class AppsDataSource {
 		  						  AppOpenHelper.COLUMN_STARTTIME,
 		  						  AppOpenHelper.COLUMN_ACTIVE,
 		  						  AppOpenHelper.COLUMN_DATERECORDED};
+  Context mContext;
 
   public AppsDataSource(Context context) {
     dbHelper = new AppOpenHelper(context);
+    mContext = context;
   }
 
   public void open() throws SQLException {
@@ -76,7 +81,17 @@ public class AppsDataSource {
   }
 
   private AppInfo cursorToApp(Cursor cursor) {
-    AppInfo app = new AppInfo();
+	  PackageManager pm = mContext.getPackageManager();
+	  PackageInfo packageinfo;
+		try {
+			packageinfo = pm.getPackageInfo (cursor.getString(1), 0);
+			//update database
+			
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    AppInfo app = new AppInfo(packageinfo, mContext);
     app.setId(cursor.getLong(0));
     app.setComment(cursor.getString(1));
     return app;
