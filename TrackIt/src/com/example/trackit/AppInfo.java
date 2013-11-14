@@ -5,15 +5,15 @@ import android.content.pm.PackageInfo;
 
 public class AppInfo {
 	
-	String name;
-	String label;
-	long runTime;
-	long startTime;
-	PackageInfo appPackage;
-	boolean active;
-	Context mContext;
-	long appID;
-	String dateRecorded;
+	private String name;
+	private String label;
+	private long runTime;
+	private long startTime;
+	private PackageInfo appPackage;
+	private boolean active;
+	private Context mContext;
+	private long appID;
+	private String dateRecorded;
 	
 	public AppInfo(PackageInfo pinfo, Context context){
 		this.appPackage = pinfo;
