@@ -38,7 +38,7 @@ public class AppInfo {
 		return label;
 	}
 	
-	public void setStartTime(long starTime){
+	public void setStartTime(long startTime){
 		this.startTime = startTime;
 	}
 	
