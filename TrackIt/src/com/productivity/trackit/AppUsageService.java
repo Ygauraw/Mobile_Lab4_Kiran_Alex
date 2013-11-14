@@ -66,10 +66,10 @@ public class AppUsageService extends Service {
             if (info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) 
                 {
             		String[] packages = info.pkgList;
-            		String mypackage = packages[0];
+            		String foregroundpackage = packages[0];
             		PackageManager pm = this.getPackageManager();
             		try {
-						PackageInfo packageinfo = pm.getPackageInfo (mypackage, 0);
+						PackageInfo packageinfo = pm.getPackageInfo (foregroundpackage, 0);
 						//update database
 						
 					} catch (NameNotFoundException e) {
