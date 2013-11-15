@@ -22,6 +22,7 @@ import android.content.pm.PackageInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -129,30 +130,52 @@ public class AppList extends Activity {
                        popupView, LayoutParams.WRAP_CONTENT,  
                              LayoutParams.WRAP_CONTENT);
                
-               Button btnProductive = (Button)popupView.findViewById(R.id.set_productive);
-               Button btnUnproductive = (Button)popupView.findViewById(R.id.set_unproductive);
-               Button btnNoLabel = (Button)popupView.findViewById(R.id.set_nolabel);
+               final Button btnProductive = (Button)popupView.findViewById(R.id.set_productive);
+               final Button btnUnproductive = (Button)popupView.findViewById(R.id.set_unproductive);
+               final Button btnNoLabel = (Button)popupView.findViewById(R.id.set_nolabel);
 
-               btnProductive.setOnClickListener(new Button.OnClickListener(){
-
-            	   public void onClick(View v) {
-            		   // TODO Auto-generated method stub
-            		   popupWindow.dismiss();
-            	   }});
+               final int whichLabel = labelPosition;
+               final int whichApp = appPosition;
                
-               btnUnproductive.setOnClickListener(new Button.OnClickListener(){
-
-            	   public void onClick(View v) {
-            		   // TODO Auto-generated method stub
-            		   popupWindow.dismiss();
-            	   }});
+               OnClickListener listener = new Button.OnClickListener() {
+            	    @Override
+            	    public void onClick(View v) {
+            	    	String newLabel;
+            	        if (v.equals(btnProductive)) {
+            	        	newLabel = ProdUtils.PRODUCTIVE_LABEL;
+            	        	Toast.makeText(getApplicationContext(), "OK", whichApp);
+            	        } 
+            	        else if(v.equals(btnUnproductive)) {
+            	            newLabel = ProdUtils.UNPRODUCTIVE_LABEL;
+            	        }
+            	        else{
+            	        	newLabel = ProdUtils.NO_LABEL;
+            	        }
+            	        String appName;
+            	        List<String> apps;
+            	        apps = appsByLabel.get(labels.get(whichLabel));
+            	        appName = apps.get(whichApp).substring(0, apps.get(whichApp).lastIndexOf(" "));
+            	        appName = appName.trim();
+            	        setLabel(appName, newLabel);
+             		    Toast.makeText(getApplicationContext(), appName + " " + newLabel, whichApp).show();
+             		    
+             		    // preparing list data
+             	        prepareAppsListData();
+             	        
+             	        //initialize adapter
+             	        listAdapter = new ExpandableAppsListAdapter(getApplicationContext(), labels, appsByLabel);
+             	        
+             	        // setting list adapter
+             	        expListView.setAdapter(listAdapter);
+            	        popupWindow.dismiss();
+            	    }
+            	};
                
-               btnNoLabel.setOnClickListener(new Button.OnClickListener(){
-
-            	   public void onClick(View v) {
-            		   // TODO Auto-generated method stub
-            		   popupWindow.dismiss();
-            	   }});
+               btnProductive.setOnClickListener(listener);
+               
+               btnUnproductive.setOnClickListener(listener);
+               
+               btnNoLabel.setOnClickListener(listener);
                
                popupWindow.showAsDropDown(v);
             	
@@ -196,10 +219,10 @@ public class AppList extends Activity {
 					TimeUnit.MILLISECONDS.toSeconds(currApp.getRunTime()) - 
 					TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currApp.getRunTime())));  
 			currAppDisplay = String.format("%30s %-8s", currApp.getName(), formatRunTime);
-			if(currAppLabel == ProdUtils.PRODUCTIVE_LABEL){
+			if(currAppLabel.equals(ProdUtils.PRODUCTIVE_LABEL)){
 				productiveApps.add(currAppDisplay);
 			}
-			else if(currAppLabel == ProdUtils.UNPRODUCTIVE_LABEL){
+			else if(currAppLabel.equals(ProdUtils.UNPRODUCTIVE_LABEL)){
 				unproductiveApps.add(currAppDisplay);
 			}
 			else{
@@ -221,7 +244,7 @@ public class AppList extends Activity {
 		return true;
 	}
 	
-	private void setLabel(String packName, String newLabel){
+	private void setLabel(String appName, String newLabel){
 		int i;
 		//get all the apps
 		List<AppInfo> allApps;
@@ -233,23 +256,25 @@ public class AppList extends Activity {
 		
 		//app iterator
 		AppInfo currApp;
+		//variables to store for current app
 		long currAppRunTime, currAppStartTime;
-		String currAppDateRecorded;
+		String currAppDateRecorded, currAppPackageName;
 		boolean currAppActive;
 		
 		
 		for(i = 0; i < allApps.size(); i++){
 			currApp = allApps.get(i);
-			if(currApp.getPackageInfo().packageName.equals(packName)){
+			if(currApp.getName().equals(appName)){
 				//store the current app's info
 				currAppRunTime = currApp.getRunTime();
 				currAppStartTime = currApp.getStartTime();
 				currAppDateRecorded = currApp.getDateRecorded();
 				currAppActive = currApp.getActive();
+				currAppPackageName = currApp.getPackageInfo().packageName;
 				//delete the current app from database
 				appData.deleteApp(currApp);
 				//add app back to database with new label
-				appData.createApp(packName, newLabel, currAppRunTime,
+				appData.createApp(currAppPackageName, newLabel, currAppRunTime,
 						currAppStartTime, currAppActive, currAppDateRecorded);
 				break;
 			}
