@@ -17,8 +17,13 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupClickListener;
+import android.widget.ExpandableListView.OnGroupCollapseListener;
+import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AppList extends Activity {
 
@@ -59,15 +64,15 @@ public class AppList extends Activity {
         // setting list adapter
         expListView.setAdapter(listAdapter);
         
-     /*// Listview Group click listener
+        // Listview Group click listener
         expListView.setOnGroupClickListener(new OnGroupClickListener() {
  
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v,
-                    int groupPosition, long id) {
-                // Toast.makeText(getApplicationContext(),
-                // "Group Clicked " + listDataHeader.get(groupPosition),
-                // Toast.LENGTH_SHORT).show();
+                    int labelPosition, long id) {
+            	/*Toast.makeText(getApplicationContext(),
+                "Group Clicked " + labels.get(labelPosition),
+                Toast.LENGTH_SHORT).show();*/
                 return false;
             }
         });
@@ -76,9 +81,9 @@ public class AppList extends Activity {
         expListView.setOnGroupExpandListener(new OnGroupExpandListener() {
  
             @Override
-            public void onGroupExpand(int groupPosition) {
+            public void onGroupExpand(int labelPosition) {
                 Toast.makeText(getApplicationContext(),
-                        listDataHeader.get(groupPosition) + " Expanded",
+                        labels.get(labelPosition) + " Expanded",
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -87,9 +92,9 @@ public class AppList extends Activity {
         expListView.setOnGroupCollapseListener(new OnGroupCollapseListener() {
  
             @Override
-            public void onGroupCollapse(int groupPosition) {
+            public void onGroupCollapse(int labelPosition) {
                 Toast.makeText(getApplicationContext(),
-                        listDataHeader.get(groupPosition) + " Collapsed",
+                        labels.get(labelPosition) + " Collapsed",
                         Toast.LENGTH_SHORT).show();
  
             }
@@ -100,19 +105,19 @@ public class AppList extends Activity {
  
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
-                    int groupPosition, int childPosition, long id) {
+                    int labelPosition, int appPosition, long id) {
                 // TODO Auto-generated method stub
                 Toast.makeText(
                         getApplicationContext(),
-                        listDataHeader.get(groupPosition)
+                        labels.get(labelPosition)
                                 + " : "
-                                + listDataChild.get(
-                                        listDataHeader.get(groupPosition)).get(
-                                        childPosition), Toast.LENGTH_SHORT)
+                                + appsByLabel.get(
+                                        labels.get(labelPosition)).get(
+                                        appPosition), Toast.LENGTH_SHORT)
                         .show();
                 return false;
             }
-        });*/		
+        });		
 	}
 
 	private void prepareAppsListData() {
@@ -132,20 +137,34 @@ public class AppList extends Activity {
 		
 		allApps = appData.getAllApps();
 		
+		//lists of productive, unproductive, and unlabeled apps
 		List<String> productiveApps = new ArrayList<String>();
 		List<String> unproductiveApps = new ArrayList<String>();
 		List<String> unlabeledApps = new ArrayList<String>();
 		
 		int i;
 		AppInfo currApp;
-		String currAppLabel, appDisplay;
+		String currAppLabel, currAppDisplay;
+		//loop to put the apps in designated lists
 		for(i = 0; i < allApps.size(); i++){
 			currApp = allApps.get(i);
 			currAppLabel = currApp.getLabel();
+			currAppDisplay = currApp.getName() + "\t" + currApp.getRunTime();
 			if(currAppLabel == ProdUtils.PRODUCTIVE_LABEL){
-				
+				productiveApps.add(currAppDisplay);
+			}
+			else if(currAppLabel == ProdUtils.UNPRODUCTIVE_LABEL){
+				unproductiveApps.add(currAppDisplay);
+			}
+			else{
+				unlabeledApps.add(currAppDisplay);
 			}
 		}
+		
+		//put apps into the groups
+		appsByLabel.put(labels.get(0), productiveApps);
+		appsByLabel.put(labels.get(1), unproductiveApps);
+		appsByLabel.put(labels.get(2), unlabeledApps);
 		
 	}
 
