@@ -1,25 +1,25 @@
 package com.example.trackit;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class CalculateProductivity {
 	
-	static ArrayList<AppInfo> allApps;
+	static List<AppInfo> allApps;
 	
-	public CalculateProductivity(ArrayList<AppInfo> allApps){
+	public CalculateProductivity(List<AppInfo> allApps){
 		CalculateProductivity.allApps = allApps;
 	}
 	
-	public static long totalRunTime(){
-		long totalTime = 0;
+	public static double totalRunTime(){
+		double totalTime = 0;
 		for(AppInfo app : allApps){
 			totalTime += app.getRunTime();
 		}
 		return totalTime;
 	}
 	
-	private static long productiveRunTime(){
-		long productiveTime = 0;
+	private static double productiveRunTime(){
+		double productiveTime = 0;
 		for(AppInfo app : allApps){
 			if(app.getLabel().equals(ProdUtils.PRODUCTIVE_LABEL)){
 				productiveTime += app.getRunTime();

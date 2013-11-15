@@ -13,7 +13,10 @@
         android:id="@+id/productivity_score"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Productivity = 100%"/>
+        android:textSize="17sp"
+        android:textColor="#000080"
+        android:gravity="center"
+        android:background="#FFFFFF"/>
 
     <ExpandableListView
         android:id="@+id/expandable_Apps_List"
