@@ -3,7 +3,6 @@ package com.example.trackit;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -13,9 +12,6 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -78,20 +74,22 @@ public class AppUsageService extends Service {
 			ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 			//get running processes
 			List<RunningAppProcessInfo> runningAppProcesses = mActivityManager.getRunningAppProcesses();
-			//for debugging
+			//FOR DEBUGGING
 			int j;
 			for(RunningAppProcessInfo rapi : runningAppProcesses){
 				String[] packages = {""};
-				if (rapi.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
+				if (rapi.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
+						rapi.importance != RunningAppProcessInfo.IMPORTANCE_BACKGROUND){
 					//list all package names of foreground process
 					packages = rapi.pkgList;
 				
 					for(j=0; j< packages.length; j++){
+						//print all packages
 						Log.i(packages[j],String.valueOf(j));
 					}
 				}
 			}
-			//end for debugging
+			//END FOR DEBUGGING
 			//iterator for running processes
 			Iterator<RunningAppProcessInfo> i = runningAppProcesses.iterator();
 			while (i.hasNext()) {
@@ -101,10 +99,11 @@ public class AppUsageService extends Service {
 				String[] packages = info.pkgList;
 				//get first package (main package)
 				String foregroundpackage = packages[0];
-				//if the current running process is in foreground
+				//if the current running process is in foreground and is not the android system
 				if (info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
 						info.importance != RunningAppProcessInfo.IMPORTANCE_BACKGROUND && 
 						!foregroundpackage.equals("android")){
+					//if top packages running are for launcher then don't record them
 					if(!foregroundpackage.equals("com.android.launcher") &&
 						!foregroundpackage.equals("com.android.systemui") && 
 						!foregroundpackage.equals("com.google.android.syncadapters.contacts")){
@@ -112,9 +111,11 @@ public class AppUsageService extends Service {
 						DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 						Date date = new Date();
 						Boolean exists = false;
+						//an array to hold all matches from the database
 						List<AppInfo> curApps = new ArrayList<AppInfo>();
 						//see if app is already in database
 						for(AppInfo app : allApps){
+							//get all database matches
 							if(app.getPackageInfo().packageName.equals(foregroundpackage)){
 								curApps.add(app);
 								exists = true;
@@ -124,7 +125,7 @@ public class AppUsageService extends Service {
 						Iterator<AppInfo> iapp = curApps.iterator();
 						while(iapp.hasNext()){
 							AppInfo anApp = iapp.next();
-							//remove all but the latest updated appinfo
+							//remove all but the latest updated appinfo (the last one stored in the database)
 							if(curApps.size() > 1){
 								iapp.remove();
 								appData.deleteApp(anApp);
@@ -146,6 +147,7 @@ public class AppUsageService extends Service {
 							long newRunTime;
 							long currentTime = System.currentTimeMillis();
 							long startTime = currentActiveApp.getStartTime();
+							//if this app's start time is too far in the past ignore the start time
 							if((currentTime - startTime) > ProdUtils.BAD_TIME_GAP){
 								startTime = currentTime;
 							}
@@ -153,17 +155,20 @@ public class AppUsageService extends Service {
 							if(currentActiveApp.getDateRecorded().equals(dateFormat.format(date))){
 								//set new run time
 								newRunTime = currentActiveApp.getRunTime() + (currentTime - startTime);
-								//delete old app data
-								appData.deleteApp(currentActiveApp);
+								//log the current active app and its runtime
 								Log.i(currentActiveApp.getName(), String.valueOf(newRunTime));
 							}
 							else{
 								//if new day delete all app's data
 								for(AppInfo app : allApps){
 									appData.deleteApp(app);
+									appData.createApp(app.getPackageInfo().packageName, app.getLabel(), 
+											0, app.getStartTime(), app.getActive(), dateFormat.format(date));
 								}
 								newRunTime = 0;
 							}
+							//delete old app data
+							appData.deleteApp(currentActiveApp);
 							//replace app data in database
 							currentActiveApp = appData.createApp(currentActiveApp.getPackageInfo().packageName, 
 									currentActiveApp.getLabel(), newRunTime, currentTime, false, dateFormat.format(date));
