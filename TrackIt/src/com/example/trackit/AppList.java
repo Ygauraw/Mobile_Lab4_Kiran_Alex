@@ -56,7 +56,7 @@ public class AppList extends Activity {
         listAdapter = new ExpandableAppsListAdapter(this, labels, appsByLabel);
         
         // setting list adapter
-//        expListView.setAdapter(listAdapter);
+        expListView.setAdapter(listAdapter);
 		
 	}
 
