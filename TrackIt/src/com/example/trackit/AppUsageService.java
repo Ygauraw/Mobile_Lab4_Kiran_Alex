@@ -2,6 +2,7 @@ package com.example.trackit;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -81,7 +82,6 @@ public class AppUsageService extends Service {
     			break;
     		}
     	}
-    	Log.i(String.valueOf(count), "It found one that exists !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     	//initialize activitymanager variable
     	ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
     	//get running processes
@@ -106,18 +106,30 @@ public class AppUsageService extends Service {
             			//get packageinfo from package name
 						PackageInfo packageinfo = pm.getPackageInfo (foregroundpackage, 0);
 						Boolean exists = false;
+						List<AppInfo> curApps = new ArrayList<AppInfo>();
 						//see if app is already in database
 						for(AppInfo app : allApps){
 				    		if(app.getPackageInfo().packageName.equals(foregroundpackage)){
-				    			currentActiveApp = app;
+				    			curApps.add(app);
 				    			exists = true;
-				    			break;
 				    		}
 				    	}
+						//iterator for running processes
+				        Iterator<AppInfo> iapp = curApps.iterator();
+				        while(iapp.hasNext()){
+				        	AppInfo anApp = iapp.next();
+				        	if(curApps.size() > 1){
+				        		iapp.remove();
+				        		appData.deleteApp(anApp);
+				        	}
+				        }
 						//create if new app
 						if(!exists){
 							currentActiveApp = appData.createApp(foregroundpackage, ProdUtils.NO_LABEL, 0, 
 														0, true, dateFormat.format(date));
+						}
+						else{
+							currentActiveApp = curApps.get(0);
 						}
 						
 						//check if new foreground app running
