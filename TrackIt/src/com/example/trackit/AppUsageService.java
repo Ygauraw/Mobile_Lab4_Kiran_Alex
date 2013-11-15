@@ -131,18 +131,12 @@ public class AppUsageService extends Service {
 							startTime = currentTime;
 						}
 						//if still from today
-						if(currentActiveApp.getDateRecorded().equals(dateFormat.format(date)) || currentTime == startTime){
+						if(currentActiveApp.getDateRecorded().equals(dateFormat.format(date))){
 							newRunTime = currentActiveApp.getRunTime() + (currentTime - startTime);
 							Log.i(currentActiveApp.getName(), String.valueOf(newRunTime));
 						}
-						//calculate time from midnight
 						else{
-							Calendar c = Calendar.getInstance(); //midnight
-						    c.set(Calendar.HOUR_OF_DAY, 0);
-						    c.set(Calendar.MINUTE, 0);
-						    c.set(Calendar.SECOND, 0);
-						    c.set(Calendar.MILLISECOND, 0);
-							newRunTime = currentTime - c.getTimeInMillis();
+							newRunTime = 0;
 						}
 						//replace app data in database
 						appData.deleteApp(currentActiveApp);
