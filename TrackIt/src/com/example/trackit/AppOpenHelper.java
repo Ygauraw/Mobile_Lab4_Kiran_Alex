@@ -7,6 +7,7 @@ import android.util.Log;
 
 public class AppOpenHelper extends SQLiteOpenHelper{
 	
+	//define the database's columns
 	public static final String APP_TABLE_NAME = "applist";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_PACKAGE = "package";
@@ -35,7 +36,7 @@ public class AppOpenHelper extends SQLiteOpenHelper{
 	public AppOpenHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
-
+//creates the database
 	@Override
 	public void onCreate(SQLiteDatabase database) {
 		database.execSQL(DATABASE_CREATE);
