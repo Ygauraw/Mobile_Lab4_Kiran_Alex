@@ -18,6 +18,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -204,8 +205,8 @@ public class AppList extends Activity {
             	     }});
 
                //popup window drops down from where you clicked
-               popupWindow.showAsDropDown(v);
-            	
+               popupWindow.showAtLocation(v, Gravity.CENTER, 0, 0); 
+               
                return false;
             }
         });		
