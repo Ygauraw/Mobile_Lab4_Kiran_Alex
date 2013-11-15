@@ -36,4 +36,12 @@ public class SysBootBroadcastReceiver extends BroadcastReceiver {
 	static public Boolean isServiceInitiated(){
 		return serviceInitiated;
 	}
+	
+	/**
+	 * Sets whether or not the service is initiated
+	 * @param true if service is initiated
+	 */
+	static public void setServiceInitiated(boolean initiated){
+		serviceInitiated = initiated;
+	}
 }

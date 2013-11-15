@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 
 public class AppUsageService extends Service {
@@ -134,9 +135,9 @@ public class AppUsageService extends Service {
 						else{
 							currentActiveApp = curApps.get(0);
 						}
-						
+						PowerManager powermang = (PowerManager) getSystemService(Context.POWER_SERVICE);
 						//check if new foreground app running
-						if(!currentActiveApp.getName().equals(lastActiveApp.getName())){
+						if(!currentActiveApp.getName().equals(lastActiveApp.getName()) || !powermang.isScreenOn()){
 							//if last active app exists
 							if(lastActiveApp != null){
 								long newRunTime;
@@ -159,11 +160,14 @@ public class AppUsageService extends Service {
 								lastActiveApp = appData.createApp(lastActiveApp.getPackageInfo().packageName, 
 										lastActiveApp.getLabel(), newRunTime, 0, false, dateFormat.format(date));
 							}
-							//replace app data in database
-							appData.deleteApp(currentActiveApp);
-							currentActiveApp = appData.createApp(currentActiveApp.getPackageInfo().packageName, 
-													currentActiveApp.getLabel(), currentActiveApp.getRunTime(), 
-													System.currentTimeMillis(), true, dateFormat.format(date));
+							//if screen is on set new active app
+							if(powermang.isScreenOn()){
+								//replace app data in database
+								appData.deleteApp(currentActiveApp);
+								currentActiveApp = appData.createApp(currentActiveApp.getPackageInfo().packageName, 
+														currentActiveApp.getLabel(), currentActiveApp.getRunTime(), 
+														System.currentTimeMillis(), true, dateFormat.format(date));
+							}
 							if(currentActiveApp!=null && lastActiveApp !=null){
 								Log.i(currentActiveApp.getName(), lastActiveApp.getName());
 								Log.i(String.valueOf(currentActiveApp.getRunTime()), String.valueOf(lastActiveApp.getRunTime()));
