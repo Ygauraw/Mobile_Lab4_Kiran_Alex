@@ -57,8 +57,6 @@ public class AppList extends Activity {
         listAdapter = new ExpandableAppsListAdapter(this, labels, appsByLabel);
         
         // setting list adapter
-<<<<<<< HEAD
-<<<<<<< HEAD
         expListView.setAdapter(listAdapter);
         
      /*// Listview Group click listener
@@ -114,14 +112,7 @@ public class AppList extends Activity {
                         .show();
                 return false;
             }
-        });*/
-=======
-//        expListView.setAdapter(listAdapter);
->>>>>>> a86af2721cf09523dba0590a1ed87a7b636fd996
-=======
-        expListView.setAdapter(listAdapter);
->>>>>>> 375784c9c939ba6667cfaa365a67fc06645c4d6f
-		
+        });*/		
 	}
 
 	private void prepareAppsListData() {
