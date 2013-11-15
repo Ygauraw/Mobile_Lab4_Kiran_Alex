@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -42,12 +44,14 @@ public class AppList extends Activity {
     ExpandableListView expListView;
     List<String> labels;
     HashMap<String, List<String>> appsByLabel;
+	AppsDataSource appData = new AppsDataSource(this);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_app_list);
 		if(!SysBootBroadcastReceiver.isServiceInitiated()){
+			SysBootBroadcastReceiver.setServiceInitiated(true);
 			Calendar cal = Calendar.getInstance();
 
 			//set AppUsageService as the pending intent for the repeated service
@@ -168,7 +172,6 @@ public class AppList extends Activity {
 		labels.add("Unlabeled Apps");
 		
 		//get all the apps from the database to put in lists
-		AppsDataSource appData = new AppsDataSource(this);
 		appData.open();
 		List<AppInfo> allApps;
 		
@@ -216,6 +219,43 @@ public class AppList extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.app_list, menu);
 		return true;
+	}
+	
+	private void setLabel(String packName, String newLabel){
+		int i;
+		//get all the apps
+		List<AppInfo> allApps;
+		//open database for editing
+		appData.open();
+		
+		//get all the apps
+		allApps = appData.getAllApps();
+		
+		//app iterator
+		AppInfo currApp;
+		long currAppRunTime, currAppStartTime;
+		String currAppDateRecorded;
+		boolean currAppActive;
+		
+		
+		for(i = 0; i < allApps.size(); i++){
+			currApp = allApps.get(i);
+			if(currApp.getPackageInfo().packageName.equals(packName)){
+				//store the current app's info
+				currAppRunTime = currApp.getRunTime();
+				currAppStartTime = currApp.getStartTime();
+				currAppDateRecorded = currApp.getDateRecorded();
+				currAppActive = currApp.getActive();
+				//delete the current app from database
+				appData.deleteApp(currApp);
+				//add app back to database with new label
+				appData.createApp(packName, newLabel, currAppRunTime,
+						currAppStartTime, currAppActive, currAppDateRecorded);
+				break;
+			}
+				
+		}
+		appData.close();
 	}
 
 }
