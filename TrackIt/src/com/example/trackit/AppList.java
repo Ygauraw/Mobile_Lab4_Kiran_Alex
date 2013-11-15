@@ -1,12 +1,9 @@
 package com.example.trackit;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -18,21 +15,16 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
-import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,7 +56,13 @@ public class AppList extends Activity {
 			alarm.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), ProdUtils.SERVICE_PERIOD, pintent);
 		}
 		
+		//get my current productivity
+		double productivity = getTotalProductivity();
+		DecimalFormat df = new DecimalFormat("#.##");
+		
+		//display the productivity
 		text1 = (TextView)findViewById(R.id.productivity_score);
+		text1.setText("Your Productivity is " + df.format(productivity*100) + "%");
 		
         // get the listview
         expListView = (ExpandableListView) findViewById(R.id.expandable_Apps_List);
@@ -151,14 +149,27 @@ public class AppList extends Activity {
             	        else{
             	        	newLabel = ProdUtils.NO_LABEL;
             	        }
+            	        
+            	        //get app name
             	        String appName;
             	        List<String> apps;
+            	        //get the selected app
             	        apps = appsByLabel.get(labels.get(whichLabel));
+            	        //get the name of the app
             	        appName = apps.get(whichApp).substring(0, apps.get(whichApp).lastIndexOf(" "));
+            	        //trim the string to keep only app name
             	        appName = appName.trim();
+            	        //set the new label for the app
             	        setLabel(appName, newLabel);
-             		    Toast.makeText(getApplicationContext(), appName + " " + newLabel, whichApp).show();
-             		    
+            	        
+            	        //get my current productivity
+            			double productivity = getTotalProductivity();
+            			DecimalFormat df = new DecimalFormat("#.##");
+            					
+            			//display the productivity
+            			text1 = (TextView)findViewById(R.id.productivity_score);
+            			text1.setText("Your Productivity is " + df.format(productivity*100) + "%");
+            	        
              		    // preparing list data
              	        prepareAppsListData();
              	        
@@ -171,17 +182,45 @@ public class AppList extends Activity {
             	    }
             	};
                
+               //set the listeners for the buttons to use the above logic
                btnProductive.setOnClickListener(listener);
                
                btnUnproductive.setOnClickListener(listener);
                
                btnNoLabel.setOnClickListener(listener);
                
+               //popup window drops down from where you clicked
                popupWindow.showAsDropDown(v);
             	
                return false;
             }
         });		
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		
+		//get my current productivity
+		double productivity = getTotalProductivity();
+		DecimalFormat df = new DecimalFormat("#.##");
+				
+		//display the productivity
+		text1 = (TextView)findViewById(R.id.productivity_score);
+		text1.setText("Your Productivity is " + df.format(productivity*100) + "%");
+				
+		// get the listview
+		expListView = (ExpandableListView) findViewById(R.id.expandable_Apps_List);
+		        
+		// preparing list data
+		prepareAppsListData();
+		        
+		//initialize adapter
+		listAdapter = new ExpandableAppsListAdapter(this, labels, appsByLabel);
+		        
+		// setting list adapter
+		expListView.setAdapter(listAdapter);
+		
 	}
 
 	private void prepareAppsListData() {
@@ -235,6 +274,7 @@ public class AppList extends Activity {
 		appsByLabel.put(labels.get(1), unproductiveApps);
 		appsByLabel.put(labels.get(2), unlabeledApps);
 		
+		appData.close();
 	}
 
 	@Override
@@ -281,6 +321,24 @@ public class AppList extends Activity {
 				
 		}
 		appData.close();
+	}
+	
+	private double getTotalProductivity(){
+		
+		List<AppInfo> allApps;
+		//open database for editing
+		appData.open();
+				
+		//get all the apps
+		allApps = appData.getAllApps();
+		
+		CalculateProductivity prodCalc = new CalculateProductivity(allApps);
+		double productivity = prodCalc.getProductivity();
+		
+		appData.close();
+		
+		return productivity;
+		
 	}
 
 }
