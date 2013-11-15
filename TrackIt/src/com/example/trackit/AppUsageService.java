@@ -163,7 +163,7 @@ public class AppUsageService extends Service {
 								for(AppInfo app : allApps){
 									appData.deleteApp(app);
 									appData.createApp(app.getPackageInfo().packageName, app.getLabel(), 
-											0, app.getStartTime(), false, dateFormat.format(date));
+											0, app.getStartTime(), app.getActive(), dateFormat.format(date));
 								}
 								newRunTime = 0;
 							}
