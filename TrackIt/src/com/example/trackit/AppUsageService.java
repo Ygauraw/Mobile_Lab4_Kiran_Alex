@@ -64,45 +64,46 @@ public class AppUsageService extends Service {
     private void getForegroundApp(){
     	//create object for app database
     	AppsDataSource appData = new AppsDataSource(this);
-    	//open database
-    	appData.open();
-    	//get all apps in database
-    	List<AppInfo> allApps = appData.getAllApps();
-    	//initialize variable for last app that was in foreground
-    	AppInfo lastActiveApp = null;
+    	try{
+    		try{
+    			//open database
+    			appData.open();
+    			//get all apps in database
+    			List<AppInfo> allApps = appData.getAllApps();
+    			//initialize variable for last app that was in foreground
+    			AppInfo lastActiveApp = null;
     	
-    	//initialize variable for current app that is in foreground
-    	AppInfo currentActiveApp = null;
-    	//find last app that was in foreground
-    	int count=0;
-    	for(AppInfo app : allApps){
-    		count++;
-    		if(app.getActive()){
-    			lastActiveApp = app;
-    			break;
-    		}
-    	}
-    	//initialize activitymanager variable
-    	ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-    	//get running processes
-        List<RunningAppProcessInfo> runningAppProcesses = mActivityManager.getRunningAppProcesses();
-        //iterator for running processes
-        Iterator<RunningAppProcessInfo> i = runningAppProcesses.iterator();
-        while (i.hasNext()) {
-        	//a running process
-            RunningAppProcessInfo info = i.next();
-            //if the current running process is in foreground
-            if (info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
-            		//list all package names of foreground process
-            		String[] packages = info.pkgList;
-            		//get first package (main package)
-            		String foregroundpackage = packages[0];
-            		//get a packagemanager
-            		PackageManager pm = this.getPackageManager();
-            		//get date and format
-            		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-					Date date = new Date();
-            		try {
+    			//initialize variable for current app that is in foreground
+    			AppInfo currentActiveApp = null;
+    			//find last app that was in foreground
+    			int count=0;
+    			for(AppInfo app : allApps){
+    				count++;
+    				if(app.getActive()){
+    					lastActiveApp = app;
+    					break;
+    				}
+    			}
+    			//initialize activitymanager variable
+    			ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+    			//get running processes
+    			List<RunningAppProcessInfo> runningAppProcesses = mActivityManager.getRunningAppProcesses();
+    			//iterator for running processes
+    			Iterator<RunningAppProcessInfo> i = runningAppProcesses.iterator();
+    			while (i.hasNext()) {
+    				//a running process
+    				RunningAppProcessInfo info = i.next();
+    				//if the current running process is in foreground
+    				if (info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
+    					//list all package names of foreground process
+    					String[] packages = info.pkgList;
+    					//get first package (main package)
+    					String foregroundpackage = packages[0];
+    					//get a packagemanager
+    					PackageManager pm = this.getPackageManager();
+    					//get date and format
+    					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+    					Date date = new Date();
             			//get packageinfo from package name
 						PackageInfo packageinfo = pm.getPackageInfo (foregroundpackage, 0);
 						Boolean exists = false;
@@ -118,6 +119,7 @@ public class AppUsageService extends Service {
 				        Iterator<AppInfo> iapp = curApps.iterator();
 				        while(iapp.hasNext()){
 				        	AppInfo anApp = iapp.next();
+				        	//remove all but the latest updated appinfo
 				        	if(curApps.size() > 1){
 				        		iapp.remove();
 				        		appData.deleteApp(anApp);
@@ -128,6 +130,7 @@ public class AppUsageService extends Service {
 							currentActiveApp = appData.createApp(foregroundpackage, ProdUtils.NO_LABEL, 0, 
 														0, true, dateFormat.format(date));
 						}
+						//if app already exists get last one updated (only one not removed)
 						else{
 							currentActiveApp = curApps.get(0);
 						}
@@ -161,24 +164,23 @@ public class AppUsageService extends Service {
 							currentActiveApp = appData.createApp(currentActiveApp.getPackageInfo().packageName, 
 													currentActiveApp.getLabel(), currentActiveApp.getRunTime(), 
 													System.currentTimeMillis(), true, dateFormat.format(date));
-						if(currentActiveApp!=null && lastActiveApp !=null){
-							Log.i(currentActiveApp.getName(), lastActiveApp.getName());
-							Log.i(String.valueOf(currentActiveApp.getRunTime()), String.valueOf(lastActiveApp.getRunTime()));
-							Log.i(String.valueOf(currentActiveApp.getStartTime()), String.valueOf(lastActiveApp.getStartTime()));
-						}	
+							if(currentActiveApp!=null && lastActiveApp !=null){
+								Log.i(currentActiveApp.getName(), lastActiveApp.getName());
+								Log.i(String.valueOf(currentActiveApp.getRunTime()), String.valueOf(lastActiveApp.getRunTime()));
+								Log.i(String.valueOf(currentActiveApp.getStartTime()), String.valueOf(lastActiveApp.getStartTime()));
+							}
 						}
-						
-						
-					} catch (NameNotFoundException e) {
-						// TODO Auto-generated catch block
-						//e.printStackTrace();
-					}
             		//break if found foreground app
             		break;
-               }
-           }
-        //close database
-        appData.close();
+    				}
+    			}
+    		}finally{
+    			//close database
+    			appData.close();
+    		}
+    	} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
     }
-
 }
