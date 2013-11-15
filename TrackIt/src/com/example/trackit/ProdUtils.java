@@ -13,5 +13,8 @@ public class ProdUtils {
 	
 	//AppUsageService period in milliseconds
 	public static final long SERVICE_PERIOD = 1000;
+	
+	//AppUsageService time since last recording of time to discount the new recording in milliseconds
+	public static final long BAD_TIME_GAP = 5000;
 
 }

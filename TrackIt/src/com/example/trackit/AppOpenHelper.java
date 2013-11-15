@@ -15,6 +15,7 @@ public class AppOpenHelper extends SQLiteOpenHelper{
 	public static final String COLUMN_STARTTIME = "starttime";
 	public static final String COLUMN_ACTIVE = "active";
 	public static final String COLUMN_DATERECORDED = "daterecorded";
+	public static final String COLUMN_LASTTIMEACTIVE = "lasttimeactive";
 
 	private static final String DATABASE_NAME = "applist.db";
 	private static final int DATABASE_VERSION = 1;
@@ -28,7 +29,8 @@ public class AppOpenHelper extends SQLiteOpenHelper{
 			+ COLUMN_RUNTIME + " time app was open today, " 
 			+ COLUMN_STARTTIME + " time app was started, " 
 			+ COLUMN_ACTIVE + " this app currently running foreground UI, " 
-			+ COLUMN_DATERECORDED + " date of runtime);";
+			+ COLUMN_DATERECORDED + " date of runtime, "
+			+ COLUMN_LASTTIMEACTIVE + " last time app was active);";
 
 	public AppOpenHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);

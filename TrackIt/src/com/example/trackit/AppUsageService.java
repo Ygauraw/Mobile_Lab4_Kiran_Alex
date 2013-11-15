@@ -66,125 +66,97 @@ public class AppUsageService extends Service {
     	//create object for app database
     	AppsDataSource appData = new AppsDataSource(this);
     	try{
-    		try{
-    			//open database
-    			appData.open();
-    			//get all apps in database
-    			List<AppInfo> allApps = appData.getAllApps();
-    			//initialize variable for last app that was in foreground
-    			AppInfo lastActiveApp = null;
-    	
-    			//initialize variable for current app that is in foreground
-    			AppInfo currentActiveApp = null;
-    			//find last app that was in foreground
-    			int count=0;
-    			for(AppInfo app : allApps){
-    				count++;
-    				if(app.getActive()){
-    					lastActiveApp = app;
-    					break;
-    				}
-    			}
-    			//initialize activitymanager variable
-    			ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-    			//get running processes
-    			List<RunningAppProcessInfo> runningAppProcesses = mActivityManager.getRunningAppProcesses();
-    			//iterator for running processes
-    			Iterator<RunningAppProcessInfo> i = runningAppProcesses.iterator();
-    			while (i.hasNext()) {
-    				//a running process
-    				RunningAppProcessInfo info = i.next();
-    				//if the current running process is in foreground
-    				if (info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
-    					//list all package names of foreground process
-    					String[] packages = info.pkgList;
-    					//get first package (main package)
-    					String foregroundpackage = packages[0];
-    					//get a packagemanager
-    					PackageManager pm = this.getPackageManager();
-    					//get date and format
-    					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-    					Date date = new Date();
-            			//get packageinfo from package name
-						PackageInfo packageinfo = pm.getPackageInfo (foregroundpackage, 0);
-						Boolean exists = false;
-						List<AppInfo> curApps = new ArrayList<AppInfo>();
-						//see if app is already in database
-						for(AppInfo app : allApps){
-				    		if(app.getPackageInfo().packageName.equals(foregroundpackage)){
-				    			curApps.add(app);
-				    			exists = true;
-				    		}
-				    	}
-						//iterator for running processes
-				        Iterator<AppInfo> iapp = curApps.iterator();
-				        while(iapp.hasNext()){
-				        	AppInfo anApp = iapp.next();
-				        	//remove all but the latest updated appinfo
-				        	if(curApps.size() > 1){
-				        		iapp.remove();
-				        		appData.deleteApp(anApp);
-				        	}
-				        }
-						//create if new app
-						if(!exists){
-							currentActiveApp = appData.createApp(foregroundpackage, ProdUtils.NO_LABEL, 0, 
-														0, true, dateFormat.format(date));
+			//open database
+			appData.open();
+			//get all apps in database
+			List<AppInfo> allApps = appData.getAllApps();
+  	
+			//initialize variable for current app that is in foreground
+			AppInfo currentActiveApp = null;
+			
+			//initialize activitymanager variable
+			ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+			//get running processes
+			List<RunningAppProcessInfo> runningAppProcesses = mActivityManager.getRunningAppProcesses();
+			//iterator for running processes
+			Iterator<RunningAppProcessInfo> i = runningAppProcesses.iterator();
+			while (i.hasNext()) {
+				//a running process
+				RunningAppProcessInfo info = i.next();
+				//if the current running process is in foreground
+				if (info.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
+					//list all package names of foreground process
+					String[] packages = info.pkgList;
+					//get first package (main package)
+					String foregroundpackage = packages[0];
+					//get date and format
+					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+					Date date = new Date();
+					Boolean exists = false;
+					List<AppInfo> curApps = new ArrayList<AppInfo>();
+					//see if app is already in database
+					for(AppInfo app : allApps){
+			    		if(app.getPackageInfo().packageName.equals(foregroundpackage)){
+			    			curApps.add(app);
+			    			exists = true;
+			    		}
+			    	}
+					//iterator for running processes
+			        Iterator<AppInfo> iapp = curApps.iterator();
+			        while(iapp.hasNext()){
+			        	AppInfo anApp = iapp.next();
+			        	//remove all but the latest updated appinfo
+			        	if(curApps.size() > 1){
+			        		iapp.remove();
+			        		appData.deleteApp(anApp);
+			        	}
+			        }
+					//create if new app
+					if(!exists){
+						currentActiveApp = appData.createApp(foregroundpackage, ProdUtils.NO_LABEL, 0, 
+													0, true, dateFormat.format(date));
+					}
+					//if app already exists get last one updated (only one not removed)
+					else{
+						currentActiveApp = curApps.get(0);
+					}
+					
+					PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+					//if app is driving UI and screen is on
+					if(pm.isScreenOn()){
+						long newRunTime;
+						long currentTime = System.currentTimeMillis();
+						long startTime = currentActiveApp.getStartTime();
+						if((currentTime - startTime) > ProdUtils.BAD_TIME_GAP){
+							startTime = currentTime;
 						}
-						//if app already exists get last one updated (only one not removed)
+						//if still from today
+						if(currentActiveApp.getDateRecorded().equals(dateFormat.format(date)) || currentTime == startTime){
+							newRunTime = currentActiveApp.getRunTime() + (currentTime - startTime);
+							Log.i(currentActiveApp.getName(), String.valueOf(newRunTime));
+						}
+						//calculate time from midnight
 						else{
-							currentActiveApp = curApps.get(0);
+							Calendar c = Calendar.getInstance(); //midnight
+						    c.set(Calendar.HOUR_OF_DAY, 0);
+						    c.set(Calendar.MINUTE, 0);
+						    c.set(Calendar.SECOND, 0);
+						    c.set(Calendar.MILLISECOND, 0);
+							newRunTime = currentTime - c.getTimeInMillis();
 						}
-						PowerManager powermang = (PowerManager) getSystemService(Context.POWER_SERVICE);
-						//check if new foreground app running
-						if(!currentActiveApp.getName().equals(lastActiveApp.getName()) || !powermang.isScreenOn()){
-							//if last active app exists
-							if(lastActiveApp != null){
-								long newRunTime;
-								//if still from today
-								if(lastActiveApp.getDateRecorded().equals(dateFormat.format(date))){
-									newRunTime = lastActiveApp.getRunTime() + (System.currentTimeMillis() - lastActiveApp.getStartTime());
-									Log.i(lastActiveApp.getName(), String.valueOf(newRunTime));
-								}
-								//calculate time from midnight
-								else{
-									Calendar c = Calendar.getInstance(); //midnight
-								    c.set(Calendar.HOUR_OF_DAY, 0);
-								    c.set(Calendar.MINUTE, 0);
-								    c.set(Calendar.SECOND, 0);
-								    c.set(Calendar.MILLISECOND, 0);
-									newRunTime = System.currentTimeMillis() - c.getTimeInMillis();
-								}
-								//replace app data in database
-								appData.deleteApp(lastActiveApp);
-								lastActiveApp = appData.createApp(lastActiveApp.getPackageInfo().packageName, 
-										lastActiveApp.getLabel(), newRunTime, 0, false, dateFormat.format(date));
-							}
-							//if screen is on set new active app
-							if(powermang.isScreenOn()){
-								//replace app data in database
-								appData.deleteApp(currentActiveApp);
-								currentActiveApp = appData.createApp(currentActiveApp.getPackageInfo().packageName, 
-														currentActiveApp.getLabel(), currentActiveApp.getRunTime(), 
-														System.currentTimeMillis(), true, dateFormat.format(date));
-							}
-							if(currentActiveApp!=null && lastActiveApp !=null){
-								Log.i(currentActiveApp.getName(), lastActiveApp.getName());
-								Log.i(String.valueOf(currentActiveApp.getRunTime()), String.valueOf(lastActiveApp.getRunTime()));
-								Log.i(String.valueOf(currentActiveApp.getStartTime()), String.valueOf(lastActiveApp.getStartTime()));
-							}
-						}
-            		//break if found foreground app
-            		break;
-    				}
-    			}
-    		}finally{
-    			//close database
-    			appData.close();
-    		}
-    	} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+						//replace app data in database
+						appData.deleteApp(currentActiveApp);
+						currentActiveApp = appData.createApp(currentActiveApp.getPackageInfo().packageName, 
+								currentActiveApp.getLabel(), newRunTime, currentTime, false, dateFormat.format(date));
+					}
+					
+				//break if found foreground app
+				break;
+				}
+			}
+		}finally{
+			//close database
+			appData.close();
 		}
     }
 }
