@@ -66,19 +66,22 @@ public class AppUsageService extends Service {
     	//open database
     	appData.open();
     	//get all apps in database
-    	List<AppInfo> allApps = appData.getAllAppss();
+    	List<AppInfo> allApps = appData.getAllApps();
     	//initialize variable for last app that was in foreground
     	AppInfo lastActiveApp = null;
     	
     	//initialize variable for current app that is in foreground
     	AppInfo currentActiveApp = null;
     	//find last app that was in foreground
+    	int count=0;
     	for(AppInfo app : allApps){
+    		count++;
     		if(app.getActive()){
     			lastActiveApp = app;
     			break;
     		}
     	}
+    	Log.i(String.valueOf(count), "It found one that exists !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     	//initialize activitymanager variable
     	ActivityManager mActivityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
     	//get running processes
@@ -105,7 +108,7 @@ public class AppUsageService extends Service {
 						Boolean exists = false;
 						//see if app is already in database
 						for(AppInfo app : allApps){
-				    		if(app.getPackageInfo().equals(packageinfo)){
+				    		if(app.getPackageInfo().packageName.equals(foregroundpackage)){
 				    			currentActiveApp = app;
 				    			exists = true;
 				    			break;
@@ -116,14 +119,16 @@ public class AppUsageService extends Service {
 							currentActiveApp = appData.createApp(foregroundpackage, ProdUtils.NO_LABEL, 0, 
 														0, true, dateFormat.format(date));
 						}
+						
 						//check if new foreground app running
-						if(!currentActiveApp.equals(lastActiveApp)){
+						if(!currentActiveApp.getName().equals(lastActiveApp.getName())){
 							//if last active app exists
 							if(lastActiveApp != null){
 								long newRunTime;
 								//if still from today
 								if(lastActiveApp.getDateRecorded().equals(dateFormat.format(date))){
 									newRunTime = lastActiveApp.getRunTime() + (System.currentTimeMillis() - lastActiveApp.getStartTime());
+									Log.i(lastActiveApp.getName(), String.valueOf(newRunTime));
 								}
 								//calculate time from midnight
 								else{
@@ -136,18 +141,25 @@ public class AppUsageService extends Service {
 								}
 								//replace app data in database
 								appData.deleteApp(lastActiveApp);
-								appData.createApp(lastActiveApp.getPackageInfo().packageName, lastActiveApp.getLabel(), 
-										newRunTime, 0, false, dateFormat.format(date));
+								lastActiveApp = appData.createApp(lastActiveApp.getPackageInfo().packageName, 
+										lastActiveApp.getLabel(), newRunTime, 0, false, dateFormat.format(date));
 							}
 							//replace app data in database
 							appData.deleteApp(currentActiveApp);
-							appData.createApp(currentActiveApp.getPackageInfo().packageName, currentActiveApp.getLabel(), 
-									currentActiveApp.getRunTime(), System.currentTimeMillis(), true, dateFormat.format(date));
+							currentActiveApp = appData.createApp(currentActiveApp.getPackageInfo().packageName, 
+													currentActiveApp.getLabel(), currentActiveApp.getRunTime(), 
+													System.currentTimeMillis(), true, dateFormat.format(date));
+						if(currentActiveApp!=null && lastActiveApp !=null){
+							Log.i(currentActiveApp.getName(), lastActiveApp.getName());
+							Log.i(String.valueOf(currentActiveApp.getRunTime()), String.valueOf(lastActiveApp.getRunTime()));
+							Log.i(String.valueOf(currentActiveApp.getStartTime()), String.valueOf(lastActiveApp.getStartTime()));
+						}	
 						}
+						
 						
 					} catch (NameNotFoundException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						//e.printStackTrace();
 					}
             		//break if found foreground app
             		break;

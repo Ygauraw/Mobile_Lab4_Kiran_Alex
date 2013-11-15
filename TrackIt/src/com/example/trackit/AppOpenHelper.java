@@ -22,12 +22,12 @@ public class AppOpenHelper extends SQLiteOpenHelper{
 	// Database creation sql statement
 	private static final String DATABASE_CREATE = "create table "
 			+ APP_TABLE_NAME + "(" 
-			+ COLUMN_ID + " integer primary key autoincrement, "
+			+ COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 			+ COLUMN_PACKAGE + " package name of app, "
 			+ COLUMN_LABEL + " productivity of app, "
 			+ COLUMN_RUNTIME + " time app was open today, " 
 			+ COLUMN_STARTTIME + " time app was started, " 
-			+ COLUMN_ACTIVE + " is this app currently running in foreground, " 
+			+ COLUMN_ACTIVE + " this app currently running foreground UI, " 
 			+ COLUMN_DATERECORDED + " date of runtime);";
 
 	public AppOpenHelper(Context context) {
