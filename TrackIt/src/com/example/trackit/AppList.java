@@ -192,7 +192,7 @@ public class AppList extends Activity {
 					TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(currApp.getRunTime())), // The change is in this line
 					TimeUnit.MILLISECONDS.toSeconds(currApp.getRunTime()) - 
 					TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currApp.getRunTime())));  
-			currAppDisplay = String.format("%-30s %8s", currApp.getName(), formatRunTime);
+			currAppDisplay = String.format("%30s %-8s", currApp.getName(), formatRunTime);
 			if(currAppLabel == ProdUtils.PRODUCTIVE_LABEL){
 				productiveApps.add(currAppDisplay);
 			}
