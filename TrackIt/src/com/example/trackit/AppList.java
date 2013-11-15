@@ -6,22 +6,26 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.os.Bundle;
+import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
 import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -106,16 +110,44 @@ public class AppList extends Activity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
                     int labelPosition, int appPosition, long id) {
-                // TODO Auto-generated method stub
-                Toast.makeText(
-                        getApplicationContext(),
-                        labels.get(labelPosition)
-                                + " : "
-                                + appsByLabel.get(
-                                        labels.get(labelPosition)).get(
-                                        appPosition), Toast.LENGTH_SHORT)
-                        .show();
-                return false;
+            	
+            	LayoutInflater layoutInflater 
+                = (LayoutInflater)getBaseContext()
+                 .getSystemService(LAYOUT_INFLATER_SERVICE);  
+               View popupView = layoutInflater.inflate(R.layout.select_label_popup, null);
+               
+               final PopupWindow popupWindow = new PopupWindow(
+                       popupView, LayoutParams.WRAP_CONTENT,  
+                             LayoutParams.WRAP_CONTENT);
+               
+               Button btnProductive = (Button)popupView.findViewById(R.id.set_productive);
+               Button btnUnproductive = (Button)popupView.findViewById(R.id.set_unproductive);
+               Button btnNoLabel = (Button)popupView.findViewById(R.id.set_nolabel);
+
+               btnProductive.setOnClickListener(new Button.OnClickListener(){
+
+            	   public void onClick(View v) {
+            		   // TODO Auto-generated method stub
+            		   popupWindow.dismiss();
+            	   }});
+               
+               btnUnproductive.setOnClickListener(new Button.OnClickListener(){
+
+            	   public void onClick(View v) {
+            		   // TODO Auto-generated method stub
+            		   popupWindow.dismiss();
+            	   }});
+               
+               btnNoLabel.setOnClickListener(new Button.OnClickListener(){
+
+            	   public void onClick(View v) {
+            		   // TODO Auto-generated method stub
+            		   popupWindow.dismiss();
+            	   }});
+               
+               popupWindow.showAsDropDown(v);
+            	
+               return false;
             }
         });		
 	}
