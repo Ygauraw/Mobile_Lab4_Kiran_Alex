@@ -1,6 +1,8 @@
 package com.example.trackit;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -9,17 +11,22 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 public class AppList extends Activity {
 
 	TextView text1;
-	ListView prodList;
-	ListView unProdList;
-	
-	ArrayAdapter<String> aa;
+
+    ExpandableAppsListAdapter listAdapter;
+    ExpandableListView expListView;
+    List<String> labels;
+    HashMap<String, List<String>> appsByLabel;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +45,23 @@ public class AppList extends Activity {
 		}
 		
 		text1 = (TextView)findViewById(R.id.productivity_score);
-		prodList = (ListView)findViewById(R.id.productive_list);
-		unProdList = (ListView)findViewById(R.id.unproductive_list);
 		
-		aa = new ArrayAdapter<String>(this, R.layout.productive_list);
+        // get the listview
+        expListView = (ExpandableListView) findViewById(R.id.expandable_Apps_List);
+        
+        // preparing list data
+        prepareAppsListData();
+        
+        //initialize adapter
+        listAdapter = new ExpandableAppsListAdapter(this, labels, appsByLabel);
+        
+        // setting list adapter
+        expListView.setAdapter(listAdapter);
 		
-		aa.add("this is a list test");
-		prodList.setAdapter(aa);
+	}
+
+	private void prepareAppsListData() {
+		// TODO Auto-generated method stub
 		
 	}
 
@@ -53,6 +70,10 @@ public class AppList extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.app_list, menu);
 		return true;
+	}
+	
+	private void changeAppLabel(){
+		
 	}
 
 }

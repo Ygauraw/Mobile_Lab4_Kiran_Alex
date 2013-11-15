@@ -14,16 +14,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Productivity = 100%"/>
-    
-    <ListView
-        android:id="@+id/productive_list"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+
+    <ExpandableListView
+        android:id="@+id/expandable_Apps_List"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
         android:layout_below="@id/productivity_score"/>
-    <ListView 
-        android:id="@+id/unproductive_list"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/productive_list"/>
     
 </RelativeLayout>
