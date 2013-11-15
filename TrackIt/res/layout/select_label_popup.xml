@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" 
+    android:background="@android:color/background_light">
+ <LinearLayout 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:orientation="vertical" 
+     android:layout_margin="1dp"
+     android:background="@android:color/darker_gray">
+     <LinearLayout 
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="vertical" 
+      android:layout_margin="20dp">
+      <TextView
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="Set App Type As:" />
+
+      <Button
+          android:id="@+id/set_productive"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="Productive" />
+      <Button
+          android:id="@+id/set_unproductive"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="Unproductive" />
+      <Button
+          android:id="@+id/set_nolabel"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="No Label" />
+      </LinearLayout>
+ </LinearLayout>
+</LinearLayout>
