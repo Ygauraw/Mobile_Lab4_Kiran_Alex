@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+//custom adapter class to use for expandable listview (basically the main UI content)
 public class ExpandableAppsListAdapter extends BaseExpandableListAdapter {
 	
     private Context mContext;
