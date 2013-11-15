@@ -155,8 +155,6 @@ public class AppUsageService extends Service {
 							if(currentActiveApp.getDateRecorded().equals(dateFormat.format(date))){
 								//set new run time
 								newRunTime = currentActiveApp.getRunTime() + (currentTime - startTime);
-								//delete old app data
-								appData.deleteApp(currentActiveApp);
 								//log the current active app and its runtime
 								Log.i(currentActiveApp.getName(), String.valueOf(newRunTime));
 							}
@@ -164,9 +162,13 @@ public class AppUsageService extends Service {
 								//if new day delete all app's data
 								for(AppInfo app : allApps){
 									appData.deleteApp(app);
+									appData.createApp(app.getPackageInfo().packageName, app.getLabel(), 
+											0, app.getStartTime(), false, dateFormat.format(date));
 								}
 								newRunTime = 0;
 							}
+							//delete old app data
+							appData.deleteApp(currentActiveApp);
 							//replace app data in database
 							currentActiveApp = appData.createApp(currentActiveApp.getPackageInfo().packageName, 
 									currentActiveApp.getLabel(), newRunTime, currentTime, false, dateFormat.format(date));
