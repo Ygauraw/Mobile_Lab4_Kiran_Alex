@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import android.os.Bundle;
 import android.app.ActionBar.LayoutParams;
@@ -185,7 +186,13 @@ public class AppList extends Activity {
 		for(i = 0; i < allApps.size(); i++){
 			currApp = allApps.get(i);
 			currAppLabel = currApp.getLabel();
-			currAppDisplay = currApp.getName() + "\t" + currApp.getRunTime();
+			String formatRunTime = String.format(Locale.getDefault(),"%02d:%02d:%02d", 
+					TimeUnit.MILLISECONDS.toHours(currApp.getRunTime()),
+					TimeUnit.MILLISECONDS.toMinutes(currApp.getRunTime()) -  
+					TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(currApp.getRunTime())), // The change is in this line
+					TimeUnit.MILLISECONDS.toSeconds(currApp.getRunTime()) - 
+					TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currApp.getRunTime())));  
+			currAppDisplay = String.format("%-30s %8s", currApp.getName(), formatRunTime);
 			if(currAppLabel == ProdUtils.PRODUCTIVE_LABEL){
 				productiveApps.add(currAppDisplay);
 			}
