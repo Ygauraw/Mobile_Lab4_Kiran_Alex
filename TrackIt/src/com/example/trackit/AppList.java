@@ -3,9 +3,12 @@ package com.example.trackit;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import android.os.Bundle;
@@ -131,6 +134,8 @@ public class AppList extends Activity {
                final Button btnProductive = (Button)popupView.findViewById(R.id.set_productive);
                final Button btnUnproductive = (Button)popupView.findViewById(R.id.set_unproductive);
                final Button btnNoLabel = (Button)popupView.findViewById(R.id.set_nolabel);
+               final Button btnCancel = (Button)popupView.findViewById(R.id.cancel);
+
 
                final int whichLabel = labelPosition;
                final int whichApp = appPosition;
@@ -189,6 +194,15 @@ public class AppList extends Activity {
                
                btnNoLabel.setOnClickListener(listener);
                
+               //button to cancel if no change is desired
+               btnCancel.setOnClickListener(new Button.OnClickListener(){
+
+            	     @Override
+            	     public void onClick(View v) {
+            	      // TODO Auto-generated method stub
+            	      popupWindow.dismiss();
+            	     }});
+
                //popup window drops down from where you clicked
                popupWindow.showAsDropDown(v);
             	
